@@ -9,7 +9,6 @@ const DetailsPage = () => {
   const recipe = getRecipeById(id);
   const ingredients = recipe.ingredients;
   const instructions = recipe.instructions;
-  console.log(recipe);
   
   if (!recipe) {
     return <div>Recipe not found.</div>;
@@ -38,13 +37,18 @@ const DetailsPage = () => {
         <h1>Instructions</h1>
         <ul>
             {
-                instructions.map((instruction, index) =>{
+                instructions.map((instruction, index) =>(
                     <li key={index} className="mb-2">
                         {instruction}
                     </li>
-                })
+                ))
             }
         </ul>
+      </div>
+      <div>
+        {
+            recipe.name
+        }
       </div>
     </div>
   );
