@@ -7,8 +7,8 @@ const openai = new OpenAI({
 
 const getRecipes = async(req,res) =>{
     try{
-        const {prompt} = req.body;
-
+        console.log(req.query)
+        const { prompt } = req.query;
         if(!prompt || prompt === ''){
             console.error('No prompt was inserted');
             return res.status(400).send('No prompt was inserted');
@@ -18,7 +18,7 @@ const getRecipes = async(req,res) =>{
             model: 'gpt-4o',  // Ensure the model is correct
             messages: [
                 { role: 'system', content: 'You are a helpful assistant.' },
-                { role: 'user', content: `Give me recipe ideas in JSON format for ${prompt} without mentioning the servings, make the instructions sound more human and detailed.` }
+                { role: 'user', content: `Give me at least 5 recipe ideas in JSON format for ${prompt} without mentioning the servings, make the instructions sound more human and detailed.` }
             ],
             response_format:{
                 "type": "json_schema",

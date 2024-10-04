@@ -10,7 +10,7 @@ const App = () => {
   return(
     <RecipeProvider>
       <RouterProvider router={router}/>
-      </RecipeProvider>
+    </RecipeProvider>
   )
 };
 const rootElement = document.getElementById("app")
