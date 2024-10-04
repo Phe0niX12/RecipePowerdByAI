@@ -33,8 +33,12 @@ sequelize.authenticate()
             type:DataTypes.TEXT,
             allowNull:false,
         },
-        ingridients:{
+        ingredients:{
             type:DataTypes.TEXT,
+            allowNull:false
+        },
+        preparationTime:{
+            type:DataTypes.STRING,
             allowNull:false
         }
     })

@@ -7,7 +7,7 @@ const openai = new OpenAI({
 
 const getRecipes = async(req,res) =>{
     try{
-        console.log(req.query)
+        
         const { prompt } = req.query;
         if(!prompt || prompt === ''){
             console.error('No prompt was inserted');
@@ -18,7 +18,7 @@ const getRecipes = async(req,res) =>{
             model: 'gpt-4o',  // Ensure the model is correct
             messages: [
                 { role: 'system', content: 'You are a helpful assistant.' },
-                { role: 'user', content: `Give me at least 5 recipe ideas in JSON format for ${prompt} without mentioning the servings, make the instructions sound more human and detailed.` }
+                { role: 'user', content: `Give me at least 5 recipe ideas in JSON format for ${prompt} without mentioning the servings, make the instructions sound more human and detailed, also add the aproximate minutes it would take.` }
             ],
             response_format:{
                 "type": "json_schema",
@@ -33,6 +33,10 @@ const getRecipes = async(req,res) =>{
                         "items": {
                           "type": "object",
                           "properties": {
+                            "id":{
+                              "description":"Random unique UUIDV4",
+                              "type": "string"
+                            },
                             "name": {
                               "description": "The name of the recipe",
                               "type": "string"
@@ -50,7 +54,14 @@ const getRecipes = async(req,res) =>{
                               "items": {
                                 "type": "string"
                               }
-                            }
+                            },
+                            "preparationTime": {
+                              "description": "An aproximation of preparation time finished with m",
+                              "type": "string",
+      
+                            },
+                            
+                            
                           },
                           "required": ["name", "ingredients", "instructions"],
                           "additionalProperties": false
@@ -61,6 +72,7 @@ const getRecipes = async(req,res) =>{
                   }
                 },
               }
+          
         });
         
         const generatedText = completion.choices[0].message.content;

@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { useRecipeContext } from "../contexts/recipeContext";
-
+import "@fortawesome/fontawesome-free/css/all.min.css"
+import { Link } from "react-router-dom";
 const MainPage = () => {
   const {
     recipes,
@@ -30,6 +31,9 @@ const MainPage = () => {
   const handleDeletingFavorite = (id) => {
     deleteFromFavoriteRecipies(id);
   };
+  const goToDetails = (id) =>{
+
+  }
   return (
     <div className="flex flex-col items-center justify-center py-10 px-4 max-w-3xl mx-auto">
       <h1 className="text-3xl font-semibold mb-6 text-gray-800">
@@ -51,7 +55,7 @@ const MainPage = () => {
             loading ? "bg-green-300 cursor-not-allowed" : "hover:bg-green-600"
           }`}
         >
-          {loading ? "Searching..." : "Search"}
+        <i className="fas fa-search"></i> 
         </button>
       </div>
 
@@ -62,13 +66,22 @@ const MainPage = () => {
           <ul className="list-disc pl-5">
             {recipes.map((item, index) => (
               <li key={index} className="text-lg text-gray-700">
-                {item.name}
+                <div>{item.name}</div>
+                <div>{item.id}</div>
+                <Link to={`/recipes/${item.id}`}>clickme</Link>
               </li>
             ))}
           </ul>
         ) : (
           !loading && (
-            <p className="text-gray-500 text-lg">No results to display</p>
+            <ul className="list-disc pl-5">
+                {favoriteRecipes.map((item,index) =>(
+                    <li key={index} className="text-lg text-gray-700">
+                        {item.name}
+                        
+                    </li>
+                ))}
+            </ul>
           )
         )}
       </div>

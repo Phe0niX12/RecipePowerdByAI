@@ -1,11 +1,21 @@
 const {v4:uuidv4} = require('uuid');
 const {Recipes} = require('../model/ModelSequalizer');
+const { Json } = require('sequelize/lib/utils');
+
 
 
 const getAllFavoriteRecipes = async(req,res) =>{
     try{
         const recipes = await Recipes.findAll();
-        console.log(recipes);
+        const finalRecipies = recipes.map(recipe =>{
+            return{
+                id:recipe.id,
+                name:recipe.name,
+                ingredients:JSON.parse(recipe.ingredients),
+                instructions:JSON.parse(recipe.ingredients),
+                preparationTime:recipe.preparationTime
+            }
+        })
         if(!recipes){
             return res.status(404).send('No recipies exist');
         }
@@ -18,8 +28,18 @@ const getAllFavoriteRecipes = async(req,res) =>{
 
 const createFavoriteRecipe = async(req, res) =>{
     try{
-        const newRecipe = {...req.body};
-        const recipe = await Recipes.create(newEmail);
+        const id = uuidv4()
+        
+        const newRecipe = {
+            id:id,
+            name:req.body.name,
+            ingredients: JSON.stringify(req.body.ingredients),
+            instructions: JSON.stringify(req.body.ingredients),
+            preparationTime:req.body.preparationTime
+        }
+        
+        const recipe = await Recipes.create(newRecipe);
+        console.log(recipe);
         if(!recipe){
             return res.status(400).send('Recipe was not created');
         }

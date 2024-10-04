@@ -6,26 +6,39 @@ export const RecipeContext = createContext();
 export const RecipeProvider = ({ children }) => {
   const [recipes, setRecipes] = useState([]);
   const [favoriteRecipes, setFavoriteRecipes] = useState([]);
+  const [isRecipesLoaded, setIsRecipesLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
   const api = axios.create({ baseURL: "http://localhost:5000" });
   useEffect(() => {
+    if (favoriteRecipes.length > 0 && isRecipesLoaded === false) {
+      return;
+    }
     setLoading(true);
     api
       .get("/favoriteRecipes")
       .then((response) => {
-        console.log(response);
         setFavoriteRecipes(response.data);
       })
       .catch((e) => console.error(e))
-      .finally(setLoading(false));
+      .finally(() => {
+        setLoading(false);
+        setIsRecipesLoaded(true);
+      });
   }, []);
+
+  const getRecipeById = (id) => {
+    return recipes.find((recipe) => recipe.id === id);
+  };
 
   const getOpenAIRecipes = async (prompt) => {
     setLoading(true);
     try {
-    console.log(prompt);
-      const response = await api.get(`/recipes?prompt=${encodeURIComponent(prompt)}`);
-      if (response.status === 200) setRecipes(response.data.recipes);
+      await api
+        .get(`/recipes?prompt=${encodeURIComponent(prompt)}`)
+        .then((response) => {
+          setRecipes(response.data.recipes);
+          console.log(recipes);
+        });
     } catch (e) {
       console.error(e);
     } finally {
@@ -41,6 +54,7 @@ export const RecipeProvider = ({ children }) => {
         name: newFavoriteRecipe.name,
         ingredients: newFavoriteRecipe.ingredients,
         instructions: newFavoriteRecipe.instructions,
+        preparationTime: newFavoriteRecipe.preparationTime,
       });
       if (response.status === 200)
         setFavoriteRecipe(favoriteRecipe.push(newFavoriteRecipe));
@@ -74,6 +88,7 @@ export const RecipeProvider = ({ children }) => {
     getOpenAIRecipes,
     addToFavoriteRecipes,
     deleteFromFavoriteRecipies,
+    getRecipeById,
   };
 
   return (
