@@ -17,7 +17,17 @@ export const RecipeProvider = ({ children }) => {
     api
       .get("/favoriteRecipes")
       .then((response) => {
-        setFavoriteRecipes(response.data);
+        const parsedData = response.data.map((recipe) => {
+          return {
+            ...recipe,
+            ingredients: JSON.parse(recipe.ingredients), // Parse ingredients string to array
+            instructions: JSON.parse(recipe.instructions),
+            isFavorite:true // Parse instructions string to array
+          };
+        });
+  
+        setFavoriteRecipes(parsedData);
+        
       })
       .catch((e) => console.error(e))
       .finally(() => {
@@ -27,9 +37,17 @@ export const RecipeProvider = ({ children }) => {
   }, []);
 
   const getRecipeById = (id) => {
+    // Check if the recipe exists in favoriteRecipes first
+    const favoriteRecipe = Array.isArray(favoriteRecipes) ? favoriteRecipes.find((recipe) => recipe.id === id) : null;
+    
+    if (favoriteRecipe) {
+      console.log(favoriteRecipe)
+      return favoriteRecipe; // Return if found in favoriteRecipes
+    }
+    
+    // If not found in favoriteRecipes, search in recipes
     return recipes.find((recipe) => recipe.id === id);
   };
-
   const getOpenAIRecipes = async (prompt) => {
     setLoading(true);
     try {
@@ -56,8 +74,16 @@ export const RecipeProvider = ({ children }) => {
         instructions: newFavoriteRecipe.instructions,
         preparationTime: newFavoriteRecipe.preparationTime,
       });
-      if (response.status === 200)
-        setFavoriteRecipe(favoriteRecipe.push(newFavoriteRecipe));
+      if (response.status === 200) {
+        setFavoriteRecipes(favoriteRecipes.push(newFavoriteRecipe));
+        setRecipes((prevRecipe) =>
+          prevRecipe.map((recipe) =>
+            recipe.id === newFavoriteRecipe.id
+              ? { ...recipe, isFavorite: true }
+              : recipe
+          )
+        );
+      }
     } catch (e) {
       console.error(e);
     } finally {
@@ -67,11 +93,19 @@ export const RecipeProvider = ({ children }) => {
 
   const deleteFromFavoriteRecipies = async (id) => {
     setLoading(true);
+    console.log(id);
     try {
       const response = await api.delete(`/favoriteRecipe/${id}`);
       if (response.status === 200) {
-        setFavoriteRecipe((prevRecipe) =>
-          prevRecipe.filter((recipe) => recipe.id !== id)
+        setFavoriteRecipes((prevRecipes) =>
+          Array.isArray(prevRecipes)
+            ? prevRecipes.filter((recipe) => recipe.id !== id)
+            : []
+        );
+        setRecipes((prevRecipe) =>
+          prevRecipe.map((recipe) =>
+            recipe.id === id ? { ...recipe, isFavorite: false } : recipe
+          )
         );
       }
     } catch (e) {

@@ -40,7 +40,8 @@ sequelize.authenticate()
         preparationTime:{
             type:DataTypes.STRING,
             allowNull:false
-        }
+        },
+    
     })
 
 

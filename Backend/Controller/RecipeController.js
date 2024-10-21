@@ -12,7 +12,7 @@ const getAllFavoriteRecipes = async(req,res) =>{
                 id:recipe.id,
                 name:recipe.name,
                 ingredients:JSON.parse(recipe.ingredients),
-                instructions:JSON.parse(recipe.ingredients),
+                instructions:JSON.parse(recipe.instructions),
                 preparationTime:recipe.preparationTime
             }
         })
@@ -28,37 +28,42 @@ const getAllFavoriteRecipes = async(req,res) =>{
 
 const createFavoriteRecipe = async(req, res) =>{
     try{
-        const id = uuidv4()
-        
+       
+        console.log(req.body);
         const newRecipe = {
-            id:id,
+            id:req.body.id,
             name:req.body.name,
             ingredients: JSON.stringify(req.body.ingredients),
-            instructions: JSON.stringify(req.body.ingredients),
-            preparationTime:req.body.preparationTime
+            instructions: JSON.stringify(req.body.instructions),
+            preparationTime:req.body.preparationTime,
         }
         
         const recipe = await Recipes.create(newRecipe);
-        console.log(recipe);
+        
         if(!recipe){
             return res.status(400).send('Recipe was not created');
         }
         return res.status(200).json({recipe:recipe, message:'Recipe was added succesfully'});
     }catch(error){
+        console.log(error);
         return res.status(400).send({error:error, message:'Unexpected error at creating a new favorite recipe'});
     }
 }
 
 const deleteFavoriteRecipe = async(req,res) =>{
+    
     try{
-        const id = parseInt(req.params.id);
+        const id = req.params.id;
+
         const result = await Recipes.findByPk(id);
+
         if(!result){
             return res.status(404).send({message: `Recipe with ${id} not found`})
         }
         await result.destroy();
         res.status(200).send({message:'Recipe deleted from favorites list'})
     }catch(error){
+        console.log(error)
         res.status(400).send({error, message:'Unexpected error at deleting recipe'})
     }
 }
